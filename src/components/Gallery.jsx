@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"
+import { animate, inView, spring, spring as easing } from "motion"
 
 const filterCategories = ["All", "Interior", "Exterior", "Cabinets", "Commercial"];
 
@@ -15,9 +16,78 @@ const galleryItems = [
   { cat: "Exterior", label: "Victorian", img: "689668d3-83f8-4b1a-9522-2951d4b1cc9c.jpg" },
 ];
 
+/** Individual gallery item with spring hover zoom */
+function GalleryItem({ g, index }) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const handleEnter = () => {
+      animate(el, { transform: "scale(1.03)" }, { easing: spring({ stiffness: 250, damping: 20 }), duration: 0.3 })
+      el.style.boxShadow = "0 16px 40px -20px rgba(14,34,53,.4)"
+    }
+    const handleLeave = () => {
+      animate(el, { transform: "none" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.35 })
+      el.style.boxShadow = "none"
+    }
+
+    el.addEventListener("mouseenter", handleEnter)
+    el.addEventListener("mouseleave", handleLeave)
+
+    return () => {
+      el.removeEventListener("mouseenter", handleEnter)
+      el.removeEventListener("mouseleave", handleLeave)
+    }
+  }, [])
+
+  return (
+    <div ref={ref} style={{
+      position: "relative",
+      aspectRatio: "4/3",
+      borderRadius: 18,
+      overflow: "hidden",
+      border: "1px solid #E7E3DB",
+      backgroundImage: `url(/assets/${g.img})`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent"
+    }}>
+      <span style={{
+        position: "absolute",
+        left: 12, top: 12,
+        fontFamily: "var(--font-heading)",
+        fontWeight: 600,
+        fontSize: 11.5,
+        letterSpacing: ".03em",
+        textTransform: "uppercase",
+        color: "var(--color-text-dark)",
+        background: "rgba(255,255,255,.85)",
+        padding: "4px 10px",
+        borderRadius: 999
+      }}>{g.cat}</span>
+      <span style={{
+        position: "absolute",
+        left: 12, bottom: 11,
+        fontFamily: "var(--font-mono)",
+        fontSize: 10.5,
+        letterSpacing: ".04em",
+        textTransform: "uppercase",
+        color: "var(--color-text-muted)",
+        background: "rgba(255,255,255,.8)",
+        padding: "4px 9px",
+        borderRadius: 6
+      }}>{g.label}</span>
+    </div>
+  )
+}
+
 export default function Gallery() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [baPosition, setBaPosition] = useState(50);
+  const gridRef = useRef(null)
 
   const handleBAMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -28,6 +98,24 @@ export default function Gallery() {
   const filtered = activeFilter === "All"
     ? galleryItems
     : galleryItems.filter(g => g.cat === activeFilter);
+
+  // Scroll-triggered stagger for gallery grid
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      const items = el.querySelectorAll('[data-gallery-item]')
+      items.forEach((item, i) => {
+        animate(item,
+          { opacity: [0, 1], transform: ["translateY(18px) scale(0.95)", "none"] },
+          { delay: i * 0.07, easing: spring({ stiffness: 180, damping: 23 }), duration: 0.55 }
+        )
+      })
+    }, { margin: "-80px" })
+
+    return () => stop?.()
+  }, [filtered]) // re-trigger when filter changes
 
   return (
     <section id="gallery" className="bw-sec" style={{ padding: "100px 22px" }}>
@@ -62,7 +150,7 @@ export default function Gallery() {
               Recent projects.
             </h2>
           </div>
-          {/* Filter pills — horizontally scrollable on mobile */}
+          {/* Filter pills */}
           <div className="bw-scroll-x" style={{
             display: "flex",
             gap: 9,
@@ -70,26 +158,12 @@ export default function Gallery() {
             paddingBottom: 4
           }}>
             {filterCategories.map(f => (
-              <button key={f} onClick={() => setActiveFilter(f)} style={{
-                padding: "11px 20px",
-                minWidth: 44,
-                minHeight: 44,
-                borderRadius: 999,
-                border: f === activeFilter ? "1px solid #2563EB" : "1px solid #E7E3DB",
-                background: f === activeFilter ? "#2563EB" : "#fff",
-                color: f === activeFilter ? "#fff" : "#0E2235",
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: "pointer",
-                fontFamily: "inherit",
-                transition: "all .2s",
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent",
-                whiteSpace: "nowrap",
-                flexShrink: 0
-              }}>
-                {f}
-              </button>
+              <GalleryFilterButton
+                key={f}
+                label={f}
+                active={f === activeFilter}
+                onClick={() => setActiveFilter(f)}
+              />
             ))}
           </div>
         </div>
@@ -121,7 +195,6 @@ export default function Gallery() {
             onPointerMove={(e) => {
               if (e.buttons === 1) handleBAMove(e);
             }}
-            // Touch event handler for mobile
             onTouchMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const touch = e.touches[0];
@@ -221,64 +294,60 @@ export default function Gallery() {
         </div>
 
         {/* Image Grid */}
-        <div className="bw-gallery-grid" style={{
+        <div ref={gridRef} className="bw-gallery-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
           gap: 16,
           marginTop: 18
         }}>
           {filtered.map((g, i) => (
-            <div key={i} style={{
-              position: "relative",
-              aspectRatio: "4/3",
-              borderRadius: 18,
-              overflow: "hidden",
-              border: "1px solid #E7E3DB",
-              backgroundImage: `url(/assets/${g.img})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              transition: "transform .25s, box-shadow .25s",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "scale(1.02)";
-              e.currentTarget.style.boxShadow = "0 16px 40px -20px rgba(14,34,53,.4)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-            >
-              <span style={{
-                position: "absolute",
-                left: 12, top: 12,
-                fontFamily: "var(--font-heading)",
-                fontWeight: 600,
-                fontSize: 11.5,
-                letterSpacing: ".03em",
-                textTransform: "uppercase",
-                color: "var(--color-text-dark)",
-                background: "rgba(255,255,255,.85)",
-                padding: "4px 10px",
-                borderRadius: 999
-              }}>{g.cat}</span>
-              <span style={{
-                position: "absolute",
-                left: 12, bottom: 11,
-                fontFamily: "var(--font-mono)",
-                fontSize: 10.5,
-                letterSpacing: ".04em",
-                textTransform: "uppercase",
-                color: "var(--color-text-muted)",
-                background: "rgba(255,255,255,.8)",
-                padding: "4px 9px",
-                borderRadius: 6
-              }}>{g.label}</span>
+            <div key={i} data-gallery-item style={{ opacity: 0 }}>
+              <GalleryItem g={g} index={i} />
             </div>
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+/** Spring-animated filter button */
+function GalleryFilterButton({ label, active, onClick }) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const targetBg = active ? "#2563EB" : "#fff"
+    const targetColor = active ? "#fff" : "#0E2235"
+    const targetBorder = active ? "1px solid #2563EB" : "1px solid #E7E3DB"
+    animate(el,
+      { background: targetBg, color: targetColor, borderColor: active ? "#2563EB" : "#E7E3DB" },
+      { easing: spring({ stiffness: 250, damping: 22 }), duration: 0.3 }
+    )
+    // Also set border style directly since animate might not handle compound border
+    el.style.border = targetBorder
+  }, [active])
+
+  return (
+    <button ref={ref} onClick={onClick} style={{
+      padding: "11px 20px",
+      minWidth: 44,
+      minHeight: 44,
+      borderRadius: 999,
+      border: "1px solid #E7E3DB",
+      background: "#fff",
+      color: "#0E2235",
+      fontWeight: 600,
+      fontSize: 14,
+      cursor: "pointer",
+      fontFamily: "inherit",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent",
+      whiteSpace: "nowrap",
+      flexShrink: 0
+    }}>
+      {label}
+    </button>
+  )
 }

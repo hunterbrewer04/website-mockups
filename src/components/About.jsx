@@ -1,3 +1,7 @@
+"use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, scroll, spring } from "motion"
+
 const benefits = [
   {
     title: "Licensed & fully insured",
@@ -26,8 +30,35 @@ const benefits = [
 ];
 
 export default function About() {
+  const sectionRef = useRef(null)
+  const leftRef = useRef(null)
+  const rightRef = useRef(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    // Fade in both columns when scrolled into view with slight stagger
+    const { stop } = inView(el, () => {
+      if (leftRef.current) {
+        animate(leftRef.current,
+          { opacity: [0, 1], transform: ["translateX(-20px)", "none"] },
+          { delay: 0.05, easing: spring({ stiffness: 180, damping: 24 }), duration: 0.65 }
+        )
+      }
+      if (rightRef.current) {
+        animate(rightRef.current,
+          { opacity: [0, 1], transform: ["translateX(20px)", "none"] },
+          { delay: 0.15, easing: spring({ stiffness: 180, damping: 24 }), duration: 0.65 }
+        )
+      }
+    }, { margin: "-80px" })
+
+    return () => stop?.()
+  }, [])
+
   return (
-    <section id="about" className="bw-sec" style={{ padding: "0 22px 100px" }}>
+    <section ref={sectionRef} id="about" className="bw-sec" style={{ padding: "0 22px 100px" }}>
       <div className="bw-two-col" style={{
         maxWidth: 1180,
         margin: "0 auto",
@@ -37,7 +68,7 @@ export default function About() {
         alignItems: "center"
       }}>
         {/* Left: Text */}
-        <div>
+        <div ref={leftRef} style={{ opacity: 0 }}>
           <div style={{
             fontFamily: "var(--font-mono)",
             fontSize: 13, letterSpacing: ".14em",
@@ -98,7 +129,7 @@ export default function About() {
         </div>
 
         {/* Right: Image + Stats */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div ref={rightRef} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, opacity: 0 }}>
           <div style={{
             gridColumn: "1 / -1",
             position: "relative",

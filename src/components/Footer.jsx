@@ -1,11 +1,30 @@
 "use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
 
 export default function Footer() {
+  const footerRef = useRef(null)
+
+  useEffect(() => {
+    const el = footerRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      animate(el,
+        { opacity: [0, 1], transform: ["translateY(12px)", "none"] },
+        { easing: spring({ stiffness: 160, damping: 24 }), duration: 0.55 }
+      )
+    }, { margin: "-40px" })
+
+    return () => stop?.()
+  }, [])
+
   return (
-    <footer style={{
+    <footer ref={footerRef} style={{
       background: "var(--color-dark-secondary)",
       padding: "50px 22px 30px",
-      paddingBottom: "calc(30px + var(--safe-bottom))"
+      paddingBottom: "calc(30px + var(--safe-bottom))",
+      opacity: 0
     }}>
       <div className="bw-footer-grid" style={{
         maxWidth: 1180,
@@ -138,9 +157,21 @@ export default function Footer() {
   );
 }
 
+/** Footer link with spring color transition */
 function FooterLink({ href, children }) {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { color: "#fff" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.2 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { color: "#AAB6C6" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.25 })
+  }
+
   return (
-    <a href={href} style={{
+    <a ref={ref} href={href} style={{
       textDecoration: "none",
       color: "#AAB6C6",
       fontSize: 14.5,
@@ -148,19 +179,30 @@ function FooterLink({ href, children }) {
       minHeight: 44,
       display: "inline-flex",
       alignItems: "center",
-      transition: "color .2s",
       touchAction: "manipulation",
       WebkitTapHighlightColor: "transparent"
     }}
-    onMouseEnter={e => { e.target.style.color = "#fff"; }}
-    onMouseLeave={e => { e.target.style.color = "#AAB6C6"; }}
+    onMouseEnter={handleEnter}
+    onMouseLeave={handleLeave}
     >{children}</a>
   );
 }
 
+/** Social icon with spring hover */
 function SocialIcon({ icon }) {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "rgba(255,255,255,.12)" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.2 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "transparent" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.25 })
+  }
+
   return (
-    <a href="#top" aria-label="Social" style={{
+    <a ref={ref} href="#top" aria-label="Social" style={{
       width: 44,
       height: 44,
       minWidth: 44,
@@ -171,12 +213,11 @@ function SocialIcon({ icon }) {
       alignItems: "center",
       justifyContent: "center",
       textDecoration: "none",
-      transition: "background .2s",
       touchAction: "manipulation",
       WebkitTapHighlightColor: "transparent"
     }}
-    onMouseEnter={e => { e.target.style.background = "rgba(255,255,255,.1)"; }}
-    onMouseLeave={e => { e.target.style.background = "transparent"; }}
+    onMouseEnter={handleEnter}
+    onMouseLeave={handleLeave}
     >{icon}</a>
   );
 }

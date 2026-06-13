@@ -1,8 +1,37 @@
+"use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
+
 const towns = [
   "Northgate", "Cedar Park", "Maple Heights", "Riverton", "Oakdale", "Lakeview"
 ];
 
 export default function ServiceArea() {
+  const leftRef = useRef(null)
+  const rightRef = useRef(null)
+
+  useEffect(() => {
+    // Animate left column
+    if (leftRef.current) {
+      const { stop } = inView(leftRef.current, () => {
+        animate(leftRef.current,
+          { opacity: [0, 1], transform: ["translateX(-16px)", "none"] },
+          { easing: spring({ stiffness: 180, damping: 24 }), duration: 0.6 }
+        )
+      }, { margin: "-70px" })
+      if (rightRef.current) {
+        const { stop: stop2 } = inView(rightRef.current, () => {
+          animate(rightRef.current,
+            { opacity: [0, 1], transform: ["translateX(16px)", "none"] },
+            { delay: 0.12, easing: spring({ stiffness: 180, damping: 24 }), duration: 0.6 }
+          )
+        }, { margin: "-70px" })
+        return () => { stop(); stop2() }
+      }
+      return () => stop()
+    }
+  }, [])
+
   return (
     <section id="area" className="bw-sec" style={{ padding: "90px 22px" }}>
       <div className="bw-two-col" style={{
@@ -14,7 +43,7 @@ export default function ServiceArea() {
         alignItems: "center"
       }}>
         {/* Left: Text */}
-        <div>
+        <div ref={leftRef} style={{ opacity: 0 }}>
           <div style={{
             fontFamily: "var(--font-mono)",
             fontSize: 13, letterSpacing: ".14em",
@@ -72,13 +101,14 @@ export default function ServiceArea() {
         </div>
 
         {/* Right: Map placeholder */}
-        <div style={{
+        <div ref={rightRef} style={{
           position: "relative",
           borderRadius: 20,
           overflow: "hidden",
           border: "1px solid var(--color-border)",
           background: "linear-gradient(140deg, #EAF1FB, #F1EEE8)",
-          aspectRatio: "4/3"
+          aspectRatio: "4/3",
+          opacity: 0
         }}>
           <div style={{
             position: "absolute",

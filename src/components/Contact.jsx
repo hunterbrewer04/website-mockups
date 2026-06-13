@@ -1,8 +1,34 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      const left = el.querySelector('[data-contact-left]')
+      const right = el.querySelector('[data-contact-right]')
+      if (left) {
+        animate(left,
+          { opacity: [0, 1], transform: ["translateX(-16px)", "none"] },
+          { delay: 0.05, easing: spring({ stiffness: 180, damping: 24 }), duration: 0.6 }
+        )
+      }
+      if (right) {
+        animate(right,
+          { opacity: [0, 1], transform: ["translateY(16px)", "none"] },
+          { delay: 0.15, easing: spring({ stiffness: 180, damping: 23 }), duration: 0.6 }
+        )
+      }
+    }, { margin: "-80px" })
+
+    return () => stop?.()
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -10,7 +36,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="bw-sec" style={{ padding: "80px 22px 100px" }}>
+    <section ref={sectionRef} id="contact" className="bw-sec" style={{ padding: "80px 22px 100px" }}>
       <div className="bw-contact-grid" style={{
         maxWidth: 1180,
         margin: "0 auto",
@@ -19,7 +45,7 @@ export default function Contact() {
         gap: 56
       }}>
         {/* Left: Info */}
-        <div>
+        <div data-contact-left style={{ opacity: 0 }}>
           <div style={{
             fontFamily: "var(--font-mono)",
             fontSize: 13, letterSpacing: ".14em",
@@ -84,12 +110,13 @@ export default function Contact() {
         </div>
 
         {/* Right: Form */}
-        <div style={{
+        <div data-contact-right style={{
           background: "#fff",
           border: "1px solid var(--color-border)",
           borderRadius: 20,
           padding: 30,
-          boxShadow: "0 24px 56px -36px rgba(14,34,53,.4)"
+          boxShadow: "0 24px 56px -36px rgba(14,34,53,.4)",
+          opacity: 0
         }}>
           {submitted ? (
             <div style={{
@@ -160,29 +187,7 @@ export default function Contact() {
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Project details</span>
                 <textarea name="details" rows="4" placeholder="Tell us about the rooms, square footage, timeline…" inputMode="text" style={{ ...inputStyle, resize: "vertical", minHeight: 100 }} />
               </label>
-              <button type="submit" style={{
-                width: "100%",
-                marginTop: 20,
-                background: "var(--color-accent)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 16,
-                fontFamily: "inherit",
-                border: "none",
-                padding: 15,
-                minHeight: 56,
-                borderRadius: 12,
-                cursor: "pointer",
-                boxShadow: "0 10px 24px rgba(37,99,235,.3)",
-                transition: "background .2s, transform .2s",
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent"
-              }}
-              onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
-              >
-                Request My Free Estimate
-              </button>
+              <SubmitButton />
               <p style={{
                 textAlign: "center",
                 fontSize: 12.5,
@@ -197,6 +202,45 @@ export default function Contact() {
       </div>
     </section>
   );
+}
+
+/** Submit button with spring hover */
+function SubmitButton() {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "#1D4ED8", transform: "translateY(-1px)" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.25 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "#2563EB", transform: "none" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.3 })
+  }
+
+  return (
+    <button ref={ref} type="submit" style={{
+      width: "100%",
+      marginTop: 20,
+      background: "var(--color-accent)",
+      color: "#fff",
+      fontWeight: 600,
+      fontSize: 16,
+      fontFamily: "inherit",
+      border: "none",
+      padding: 15,
+      minHeight: 56,
+      borderRadius: 12,
+      cursor: "pointer",
+      boxShadow: "0 10px 24px rgba(37,99,235,.3)",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent"
+    }}
+    onMouseEnter={handleEnter}
+    onMouseLeave={handleLeave}
+    >
+      Request My Free Estimate
+    </button>
+  )
 }
 
 function ContactItem({ icon, label, value }) {

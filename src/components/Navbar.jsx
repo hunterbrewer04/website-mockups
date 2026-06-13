@@ -1,8 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"
+import { animate, spring } from "motion"
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuWrapperRef = useRef(null)
+  const menuPanelRef = useRef(null)
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -13,6 +16,32 @@ export default function Navbar() {
     }
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
+
+  // Spring animate menu open/close
+  useEffect(() => {
+    const overlay = menuWrapperRef.current
+    const panel = menuPanelRef.current
+    if (!overlay || !panel) return
+
+    if (menuOpen) {
+      // Fade in overlay
+      overlay.style.display = "block"
+      animate(overlay, { opacity: [0, 1] }, { easing: spring({ stiffness: 200, damping: 24 }), duration: 0.25 })
+      // Slide in panel
+      animate(panel, { opacity: [0, 1], transform: ["translateY(-12px)", "none"] }, { easing: spring({ stiffness: 220, damping: 26 }), duration: 0.3 })
+    }
+    // When menu is closing, the component unmounts so cleanup handles the CSS removal
+  }, [menuOpen])
+
+  const closeMenu = () => {
+    const overlay = menuWrapperRef.current
+    if (overlay) {
+      animate(overlay, { opacity: [1, 0] }, { easing: spring({ stiffness: 200, damping: 24 }), duration: 0.2 })
+        .finished.then(() => { setMenuOpen(false) })
+    } else {
+      setMenuOpen(false)
+    }
+  }
 
   return (
     <nav style={{
@@ -65,11 +94,11 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <div className="bw-hide-mobile" style={{ display: "flex", alignItems: "center", gap: 30 }}>
-          <a href="#services" style={{ textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15 }}>Services</a>
-          <a href="#gallery" style={{ textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15 }}>Gallery</a>
-          <a href="#reviews" style={{ textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15 }}>Reviews</a>
-          <a href="#area" style={{ textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15 }}>Service Area</a>
-          <a href="#about" style={{ textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15 }}>About</a>
+          <NavLink href="#services">Services</NavLink>
+          <NavLink href="#gallery">Gallery</NavLink>
+          <NavLink href="#reviews">Reviews</NavLink>
+          <NavLink href="#area">Service Area</NavLink>
+          <NavLink href="#about">About</NavLink>
         </div>
 
         {/* Right side */}
@@ -83,57 +112,15 @@ export default function Navbar() {
             </svg>
             (555) 248-1900
           </a>
-          <a href="#contact" className="bw-hide-mobile" style={{
-            textDecoration: "none", background: "var(--color-accent)", color: "#fff",
-            fontWeight: 600, fontSize: 15, padding: "11px 19px", borderRadius: 11,
-            boxShadow: "0 6px 16px rgba(37,99,235,.28)", transition: "background .2s, transform .2s"
-          }}
-          onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
-          >
-            Get Free Estimate
-          </a>
-          {/* Hamburger button — min 44×44px touch target */}
-          <button
-            className="bw-only-mobile"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            style={{
-              background: "transparent",
-              border: "1px solid #E7E3DB",
-              borderRadius: 10,
-              width: 44,
-              height: 44,
-              minWidth: 44,
-              minHeight: 44,
-              display: "none",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-              transition: "background .2s"
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#F7F5F1"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
-          >
-            {menuOpen ? (
-              <svg viewBox="0 0 24 24" style={{ width: 22, height: 22, stroke: "currentColor", strokeWidth: 1.8, fill: "none", strokeLinecap: "round" }}>
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" style={{ width: 22, height: 22, stroke: "currentColor", strokeWidth: 1.8, fill: "none", strokeLinecap: "round" }}>
-                <path d="M3 6h18M3 12h18M3 18h18" />
-              </svg>
-            )}
-          </button>
+          <NavCTAButton />
+          {/* Hamburger button */}
+          <HamburgerButton menuOpen={menuOpen} onClick={() => setMenuOpen(!menuOpen)} />
         </div>
       </div>
 
-      {/* Mobile Menu — full viewport height overlay */}
+      {/* Mobile Menu — spring animated */}
       {menuOpen && (
-        <div className="bw-only-mobile" style={{
+        <div ref={menuWrapperRef} className="bw-only-mobile" style={{
           display: "block",
           position: "fixed",
           top: 0,
@@ -142,13 +129,13 @@ export default function Navbar() {
           bottom: 0,
           zIndex: 1000,
           background: "rgba(0,0,0,0.3)",
-          animation: "menuSlideDown 0.25s ease-out"
+          opacity: 0
         }}
         onClick={(e) => {
-          if (e.target === e.currentTarget) setMenuOpen(false);
+          if (e.target === e.currentTarget) closeMenu()
         }}
         >
-          <div style={{
+          <div ref={menuPanelRef} style={{
             background: "#fff",
             marginTop: 72,
             padding: "0 22px",
@@ -157,7 +144,8 @@ export default function Navbar() {
             borderTop: "1px solid #E7E3DB",
             overflowY: "auto",
             WebkitOverflowScrolling: "touch",
-            animation: "menuSlideDown 0.25s ease-out"
+            opacity: 0,
+            transform: "translateY(-12px)"
           }}>
             <div style={{ display: "flex", flexDirection: "column", paddingTop: 8 }}>
               {[
@@ -167,7 +155,7 @@ export default function Navbar() {
                 ["Service Area", "#area"],
                 ["About", "#about"]
               ].map(([label, href]) => (
-                <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{
+                <a key={label} href={href} onClick={closeMenu} style={{
                   textDecoration: "none",
                   color: "#0E2235",
                   fontWeight: 500,
@@ -202,7 +190,7 @@ export default function Navbar() {
               </svg>
               (555) 248-1900
             </a>
-            <a href="#contact" onClick={() => setMenuOpen(false)} style={{
+            <a href="#contact" onClick={closeMenu} style={{
               textDecoration: "none",
               textAlign: "center",
               background: "var(--color-accent)",
@@ -225,4 +213,105 @@ export default function Navbar() {
       )}
     </nav>
   );
+}
+
+/** Desktop nav link with spring underline */
+function NavLink({ href, children }) {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { color: "#2563EB" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.2 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { color: "inherit" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.25 })
+  }
+
+  return (
+    <a ref={ref} href={href} style={{
+      textDecoration: "none", color: "inherit", fontWeight: 500, fontSize: 15,
+      transition: "none" // Motion handles the transition
+    }}
+    onMouseEnter={handleEnter}
+    onMouseLeave={handleLeave}
+    >{children}</a>
+  )
+}
+
+/** Spring-hover CTA button in nav */
+function NavCTAButton() {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "#1D4ED8", transform: "translateY(-1px)" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.25 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "#2563EB", transform: "none" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.3 })
+  }
+
+  return (
+    <a ref={ref} href="#contact" className="bw-hide-mobile" style={{
+      textDecoration: "none", background: "var(--color-accent)", color: "#fff",
+      fontWeight: 600, fontSize: 15, padding: "11px 19px", borderRadius: 11,
+      boxShadow: "0 6px 16px rgba(37,99,235,.28)"
+    }}
+    onMouseEnter={handleEnter}
+    onMouseLeave={handleLeave}
+    >
+      Get Free Estimate
+    </a>
+  )
+}
+
+/** Hamburger button */
+function HamburgerButton({ menuOpen, onClick }) {
+  const ref = useRef(null)
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "#F7F5F1" }, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.2 })
+  }
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current, { background: "transparent" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.25 })
+  }
+
+  return (
+    <button ref={ref}
+      className="bw-only-mobile"
+      onClick={onClick}
+      aria-label={menuOpen ? "Close menu" : "Open menu"}
+      aria-expanded={menuOpen}
+      style={{
+        background: "transparent",
+        border: "1px solid #E7E3DB",
+        borderRadius: 10,
+        width: 44,
+        height: 44,
+        minWidth: 44,
+        minHeight: 44,
+        display: "none",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent"
+      }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {menuOpen ? (
+        <svg viewBox="0 0 24 24" style={{ width: 22, height: 22, stroke: "currentColor", strokeWidth: 1.8, fill: "none", strokeLinecap: "round" }}>
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" style={{ width: 22, height: 22, stroke: "currentColor", strokeWidth: 1.8, fill: "none", strokeLinecap: "round" }}>
+          <path d="M3 6h18M3 12h18M3 18h18" />
+        </svg>
+      )}
+    </button>
+  )
 }

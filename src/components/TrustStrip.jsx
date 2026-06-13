@@ -1,3 +1,7 @@
+"use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
+
 const trustItems = [
   {
     icon: (
@@ -35,8 +39,27 @@ const trustItems = [
 ];
 
 export default function TrustStrip() {
+  const sectionRef = useRef(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      const items = el.querySelectorAll('[data-trust-item]')
+      items.forEach((item, i) => {
+        animate(item,
+          { opacity: [0, 1], transform: ["translateY(8px)", "none"] },
+          { delay: 0.05 + i * 0.08, easing: spring({ stiffness: 200, damping: 24 }), duration: 0.5 }
+        )
+      })
+    }, { margin: "-40px" })
+
+    return () => stop?.()
+  }, [])
+
   return (
-    <section style={{ background: "var(--color-dark-secondary)" }}>
+    <section ref={sectionRef} style={{ background: "var(--color-dark-secondary)" }}>
       <div className="bw-trust-grid" style={{
         maxWidth: 1180,
         margin: "0 auto",
@@ -46,13 +69,14 @@ export default function TrustStrip() {
         gap: 20
       }}>
         {trustItems.map((item, i) => (
-          <div key={i} style={{
+          <div key={i} data-trust-item style={{
             display: "flex",
             alignItems: "center",
             gap: 12,
             justifyContent: "center",
             padding: "6px 0",
-            minHeight: 44
+            minHeight: 44,
+            opacity: 0
           }}>
             <span style={{ color: "#7FA8F0", display: "flex", flexShrink: 0 }}>{item.icon}</span>
             <span style={{

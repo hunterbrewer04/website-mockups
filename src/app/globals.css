@@ -76,12 +76,10 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   display: none;
 }
 
-/* === Animations === */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(26px); }
-  to { opacity: 1; transform: none; }
-}
-
+/* === Animations ===
+ * NOTE: Most animations now use the Motion library (spring-based, scroll-triggered).
+ * Only GPU-accelerated CSS @keyframes are kept here: kenburns, sweep, rec.
+ */
 @keyframes kenburns {
   0% { transform: scale(1.06) translate(1%, 1%); }
   100% { transform: scale(1.22) translate(-2.5%, -2%); }
@@ -92,40 +90,9 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
   55%, 100% { left: 135%; }
 }
 
-@keyframes heroUp {
-  from { opacity: 0; transform: translateY(26px); }
-  to { opacity: 1; transform: none; }
-}
-
-@keyframes heroPop {
-  from { opacity: 0; transform: translateY(46px); }
-  to { opacity: 1; transform: none; }
-}
-
 @keyframes rec {
   0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.6); }
   70%, 100% { box-shadow: 0 0 0 7px rgba(248, 113, 113, 0); }
-}
-
-@keyframes bob {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, 7px); }
-}
-
-@keyframes scrollFadeUp {
-  from { opacity: 0; transform: translateY(26px); }
-  to { opacity: 1; transform: none; }
-}
-
-/* Mobile menu slide animation */
-@keyframes menuSlideDown {
-  from { opacity: 0; transform: translateY(-12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes menuSlideUp {
-  from { opacity: 0; transform: translateY(-12px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* === Utility classes === */
@@ -253,27 +220,6 @@ a, button, [role="button"], input[type="submit"], input[type="button"] {
 /* === Section padding === */
 .bw-sec {
   padding: 80px 22px;
-}
-
-/* === Hero animations === */
-.hero-animate-up {
-  opacity: 0;
-  animation: heroUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.hero-animate-pop {
-  opacity: 0;
-  animation: heroPop 0.9s 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.hero-animate-up-delayed {
-  opacity: 0;
-  animation: heroUp 0.8s 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.hero-animate-up-delayed-2 {
-  opacity: 0;
-  animation: heroUp 0.8s 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* === Focus styles === */

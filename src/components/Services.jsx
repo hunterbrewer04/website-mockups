@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
 
 const services = [
   {
@@ -81,9 +83,136 @@ const services = [
   }
 ];
 
-export default function Services() {
+/** Individual service card with spring hover */
+function ServiceCard({ s, index, cardRef }) {
+  const cardElRef = useRef(null)
+
+  useEffect(() => {
+    const el = cardElRef.current
+    if (!el) return
+
+    const handleEnter = () => {
+      animate(el, { transform: "translateY(-6px)" }, { easing: spring({ stiffness: 250, damping: 20 }), duration: 0.3 })
+      el.style.boxShadow = "0 26px 50px -28px rgba(14,34,53,.45)"
+      el.style.borderColor = "#D7DEEC"
+    }
+    const handleLeave = () => {
+      animate(el, { transform: "none" }, { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.35 })
+      el.style.boxShadow = "none"
+      el.style.borderColor = "#E7E3DB"
+    }
+
+    el.addEventListener("mouseenter", handleEnter)
+    el.addEventListener("mouseleave", handleLeave)
+
+    return () => {
+      el.removeEventListener("mouseenter", handleEnter)
+      el.removeEventListener("mouseleave", handleLeave)
+    }
+  }, [])
+
   return (
-    <section id="services" className="bw-sec" style={{ padding: "80px 22px 100px" }}>
+    <a ref={cardElRef} href="#contact" style={{
+      textDecoration: "none",
+      display: "block",
+      background: "#fff",
+      border: "1px solid var(--color-border)",
+      borderRadius: 18,
+      overflow: "hidden",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent"
+    }}>
+      <div style={s.imgStyle}>
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(180deg, rgba(14,34,53,0) 42%, rgba(14,34,53,.5))"
+        }} />
+        <span style={{
+          position: "absolute",
+          left: 13, top: 13,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 7,
+          background: "rgba(255,255,255,.94)",
+          borderRadius: 999,
+          padding: "5px 12px",
+          fontFamily: "var(--font-heading)",
+          fontWeight: 700,
+          fontSize: 11.5,
+          letterSpacing: ".02em",
+          color: s.accent
+        }}>{s.tag}</span>
+        <span style={{
+          position: "absolute",
+          right: 12, bottom: 12,
+          width: 44, height: 44,
+          borderRadius: 12,
+          background: "rgba(255,255,255,.94)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 6px 16px rgba(14,34,53,.2)"
+        }}>{s.icon}</span>
+      </div>
+      <div style={{ padding: "22px 24px 26px" }}>
+        <h3 style={{
+          fontFamily: "var(--font-heading)",
+          fontWeight: 700,
+          fontSize: 21,
+          color: "var(--color-text-dark)",
+          margin: 0,
+          letterSpacing: "-0.01em"
+        }}>{s.title}</h3>
+        <p style={{
+          fontSize: 15,
+          lineHeight: 1.55,
+          margin: "8px 0 0",
+          color: "var(--color-text)"
+        }}>{s.desc}</p>
+        <span style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          color: "var(--color-accent)",
+          fontWeight: 600,
+          fontSize: 14.5,
+          marginTop: 14
+        }}>
+          Learn more
+          <svg viewBox="0 0 24 24" style={{ width: 15, height: 15, stroke: "#2563EB", strokeWidth: 2, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" }}>
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </span>
+      </div>
+    </a>
+  )
+}
+
+export default function Services() {
+  const sectionRef = useRef(null)
+  const cardRefs = useRef([])
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const cards = el.querySelectorAll('[data-service-card]')
+    const { stop } = inView(el, () => {
+      cards.forEach((card, i) => {
+        animate(card,
+          { opacity: [0, 1], transform: ["translateY(20px) scale(0.97)", "none"] },
+          { delay: 0.15 + i * 0.1, easing: spring({ stiffness: 180, damping: 24 }), duration: 0.6 }
+        )
+      })
+    }, { margin: "-60px" })
+
+    return () => stop?.()
+  }, [])
+
+  return (
+    <section ref={sectionRef} id="services" className="bw-sec" style={{ padding: "80px 22px 100px" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
           <div style={{
@@ -122,102 +251,9 @@ export default function Services() {
           marginTop: 48
         }}>
           {services.map((s, i) => (
-            <a key={i} href="#contact" style={{
-              textDecoration: "none",
-              display: "block",
-              background: "#fff",
-              border: "1px solid var(--color-border)",
-              borderRadius: 18,
-              overflow: "hidden",
-              transition: "transform .25s, box-shadow .25s, border-color .25s",
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent"
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "translateY(-6px)";
-              e.currentTarget.style.boxShadow = "0 26px 50px -28px rgba(14,34,53,.45)";
-              e.currentTarget.style.borderColor = "#D7DEEC";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.boxShadow = "none";
-              e.currentTarget.style.borderColor = "#E7E3DB";
-            }}
-            // Touch-friendly active state for tap feedback
-            onTouchStart={e => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 14px 30px -18px rgba(14,34,53,.35)";
-            }}
-            onTouchEnd={e => {
-              e.currentTarget.style.transform = "none";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-            >
-              <div style={s.imgStyle}>
-                <div style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(180deg, rgba(14,34,53,0) 42%, rgba(14,34,53,.5))"
-                }} />
-                <span style={{
-                  position: "absolute",
-                  left: 13, top: 13,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 7,
-                  background: "rgba(255,255,255,.94)",
-                  borderRadius: 999,
-                  padding: "5px 12px",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 700,
-                  fontSize: 11.5,
-                  letterSpacing: ".02em",
-                  color: s.accent
-                }}>{s.tag}</span>
-                <span style={{
-                  position: "absolute",
-                  right: 12, bottom: 12,
-                  width: 44, height: 44,
-                  borderRadius: 12,
-                  background: "rgba(255,255,255,.94)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 6px 16px rgba(14,34,53,.2)"
-                }}>{s.icon}</span>
-              </div>
-              <div style={{ padding: "22px 24px 26px" }}>
-                <h3 style={{
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 700,
-                  fontSize: 21,
-                  color: "var(--color-text-dark)",
-                  margin: 0,
-                  letterSpacing: "-0.01em"
-                }}>{s.title}</h3>
-                <p style={{
-                  fontSize: 15,
-                  lineHeight: 1.55,
-                  margin: "8px 0 0",
-                  color: "var(--color-text)"
-                }}>{s.desc}</p>
-                <span style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  color: "var(--color-accent)",
-                  fontWeight: 600,
-                  fontSize: 14.5,
-                  marginTop: 14
-                }}>
-                  Learn more
-                  <svg viewBox="0 0 24 24" style={{ width: 15, height: 15, stroke: "#2563EB", strokeWidth: 2, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" }}>
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </span>
-              </div>
-            </a>
+            <div key={i} data-service-card style={{ opacity: 0, transform: "translateY(20px) scale(0.97)" }}>
+              <ServiceCard s={s} index={i} />
+            </div>
           ))}
         </div>
       </div>

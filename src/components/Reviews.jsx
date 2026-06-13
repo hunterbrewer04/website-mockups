@@ -1,3 +1,7 @@
+"use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
+
 const StarRating = ({ small }) => (
   <div style={{ display: "flex", gap: 2 }}>
     {[...Array(5)].map((_, i) => (
@@ -36,6 +40,25 @@ const reviews = [
 ];
 
 export default function Reviews() {
+  const gridRef = useRef(null)
+
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      const cards = el.querySelectorAll('[data-review-card]')
+      cards.forEach((card, i) => {
+        animate(card,
+          { opacity: [0, 1], transform: ["translateY(24px)", "none"] },
+          { delay: 0.05 + i * 0.12, easing: spring({ stiffness: 190, damping: 24 }), duration: 0.6 }
+        )
+      })
+    }, { margin: "-60px" })
+
+    return () => stop?.()
+  }, [])
+
   return (
     <section id="reviews" className="bw-sec" style={{
       padding: "96px 22px",
@@ -94,19 +117,20 @@ export default function Reviews() {
           </div>
         </div>
 
-        <div className="bw-reviews-grid" style={{
+        <div ref={gridRef} className="bw-reviews-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: 20
         }}>
           {reviews.map((r, i) => (
-            <div key={i} style={{
+            <div key={i} data-review-card style={{
               background: "var(--color-bg)",
               border: "1px solid var(--color-border)",
               borderRadius: 16,
               padding: 26,
               display: "flex",
-              flexDirection: "column"
+              flexDirection: "column",
+              opacity: 0
             }}>
               <StarRating small />
               <p style={{

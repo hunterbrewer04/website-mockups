@@ -1,3 +1,7 @@
+"use client";
+import { useEffect, useRef } from "react"
+import { animate, inView, spring } from "motion"
+
 const steps = [
   {
     num: "01",
@@ -26,6 +30,25 @@ const steps = [
 ];
 
 export default function Process() {
+  const gridRef = useRef(null)
+
+  useEffect(() => {
+    const el = gridRef.current
+    if (!el) return
+
+    const { stop } = inView(el, () => {
+      const cards = el.querySelectorAll('[data-process-step]')
+      cards.forEach((card, i) => {
+        animate(card,
+          { opacity: [0, 1], transform: ["translateY(20px) scale(0.96)", "none"] },
+          { delay: 0.05 + i * 0.1, easing: spring({ stiffness: 180, damping: 23 }), duration: 0.55 }
+        )
+      })
+    }, { margin: "-70px" })
+
+    return () => stop?.()
+  }, [])
+
   return (
     <section className="bw-sec" style={{
       padding: "96px 22px",
@@ -54,19 +77,20 @@ export default function Process() {
             Simple, from hello to walkthrough.
           </h2>
         </div>
-        <div className="bw-process-grid" style={{
+        <div ref={gridRef} className="bw-process-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
           gap: 18
         }}>
           {steps.map((p, i) => (
-            <div key={i} style={{
+            <div key={i} data-process-step style={{
               position: "relative",
               background: "var(--color-bg)",
               border: "1px solid var(--color-border)",
               borderTop: `3px solid ${p.accent}`,
               borderRadius: 16,
-              padding: "24px 22px"
+              padding: "24px 22px",
+              opacity: 0
             }}>
               <div style={{
                 fontFamily: "var(--font-heading)",

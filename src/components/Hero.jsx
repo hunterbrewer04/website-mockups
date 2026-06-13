@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useRef } from "react"
+import { animate, spring } from "motion"
 
 const StarRating = () => (
   <div style={{ display: "flex", gap: 2 }}>
@@ -11,6 +13,39 @@ const StarRating = () => (
 );
 
 export default function Hero() {
+  const badgeRef = useRef(null)
+  const headingRef = useRef(null)
+  const subcontentRef = useRef(null)
+  const ratingRef = useRef(null)
+  const scrollIndicatorRef = useRef(null)
+
+  useEffect(() => {
+    // Spring-based staggered hero entrance
+    const targets = [
+      { el: badgeRef.current, delay: 0.05 },
+      { el: headingRef.current, delay: 0.1 },
+      { el: subcontentRef.current, delay: 0.28 },
+      { el: ratingRef.current, delay: 0.42 },
+    ]
+
+    targets.forEach(({ el, delay }) => {
+      if (!el) return
+      animate(el,
+        { opacity: [0, 1], transform: ["translateY(28px)", "none"] },
+        { delay, easing: spring({ stiffness: 200, damping: 25, mass: 0.8 }), duration: 0.75 }
+      )
+    })
+
+    // Smooth bob for scroll indicator using spring physics
+    if (scrollIndicatorRef.current) {
+      const bobAnim = animate(scrollIndicatorRef.current,
+        { transform: ["translate(-50%, 0)", "translate(-50%, 7px)"] },
+        { easing: spring({ stiffness: 120, damping: 10 }), duration: 1.2, repeat: Infinity, repeatType: "reverse" }
+      )
+      return () => bobAnim.stop()
+    }
+  }, [])
+
   return (
     <header id="top" style={{
       position: "relative",
@@ -21,7 +56,7 @@ export default function Hero() {
       overflow: "hidden",
       background: "var(--color-dark)"
     }}>
-      {/* Background image */}
+      {/* Background image — keep CSS kenburns for GPU acceleration */}
       <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
         <div style={{
           position: "absolute",
@@ -51,7 +86,7 @@ export default function Hero() {
         background: "linear-gradient(180deg, rgba(11,28,44,.62) 0%, rgba(11,28,44,.24) 30%, rgba(11,28,44,.46) 60%, rgba(11,28,44,.93) 100%)"
       }} />
 
-      {/* Recording indicator */}
+      {/* Recording indicator — keep CSS @keyframes rec */}
       <div className="bw-hide-mobile" style={{
         position: "absolute",
         top: 92,
@@ -87,7 +122,7 @@ export default function Hero() {
         padding: "0 24px 60px"
       }}>
         {/* Badge */}
-        <div className="hero-animate-up bw-hero-badge" style={{
+        <div ref={badgeRef} className="bw-hero-badge" style={{
           display: "inline-flex",
           alignItems: "center",
           gap: 8,
@@ -99,6 +134,7 @@ export default function Hero() {
           fontSize: 13,
           fontWeight: 600,
           color: "#fff",
+          opacity: 0,
           WebkitBackdropFilter: "blur(6px)"
         }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#34D399" }} />
@@ -106,7 +142,7 @@ export default function Hero() {
         </div>
 
         {/* Main heading */}
-        <h1 className="hero-animate-pop bw-hero-heading" style={{
+        <h1 ref={headingRef} className="bw-hero-heading" style={{
           fontFamily: "var(--font-heading)",
           fontWeight: 800,
           color: "#fff",
@@ -115,7 +151,8 @@ export default function Hero() {
           margin: "16px 0 0",
           fontSize: "clamp(48px, 13vw, 212px)",
           textTransform: "uppercase",
-          textShadow: "0 24px 60px rgba(0,0,0,.45)"
+          textShadow: "0 24px 60px rgba(0,0,0,.45)",
+          opacity: 0
         }}>
           Brightwork
         </h1>
@@ -130,7 +167,7 @@ export default function Hero() {
           marginTop: 18
         }}>
           {/* Left text */}
-          <div className="hero-animate-up-delayed">
+          <div ref={subcontentRef} style={{ opacity: 0 }}>
             <p style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 600,
@@ -157,66 +194,29 @@ export default function Hero() {
               gap: 13,
               marginTop: 24
             }}>
-              <a href="#contact" style={{
-                textDecoration: "none",
-                background: "var(--color-accent)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 16,
-                padding: "15px 26px",
-                borderRadius: 12,
-                boxShadow: "0 14px 30px rgba(37,99,235,.4)",
-                transition: "background .2s, transform .2s",
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: 56,
-                minWidth: 44
-              }}
-              onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
-              >
-                Get a Free Estimate
-              </a>
-              <a href="#gallery" style={{
-                textDecoration: "none",
-                background: "rgba(255,255,255,.1)",
-                color: "#fff",
-                fontWeight: 600,
-                fontSize: 16,
-                padding: "15px 26px",
-                borderRadius: 12,
-                border: "1px solid rgba(255,255,255,.35)",
-                backdropFilter: "blur(6px)",
-                transition: "background .2s, transform .2s",
-                WebkitBackdropFilter: "blur(6px)",
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: 56,
-                minWidth: 44
-              }}
-              onMouseEnter={e => { e.target.style.background = "rgba(255,255,255,.2)"; e.target.style.transform = "translateY(-2px)"; }}
-              onMouseLeave={e => { e.target.style.background = "rgba(255,255,255,.1)"; e.target.style.transform = "none"; }}
-              >
-                View Our Work
-              </a>
+              <HeroButton
+                href="#contact"
+                variant="primary"
+                text="Get a Free Estimate"
+              />
+              <HeroButton
+                href="#gallery"
+                variant="ghost"
+                text="View Our Work"
+              />
             </div>
           </div>
 
           {/* Rating card */}
-          <div className="hero-animate-up-delayed-2" style={{
+          <div ref={ratingRef} style={{
             background: "#fff",
             borderRadius: 16,
             padding: "15px 19px",
             boxShadow: "0 26px 50px -20px rgba(0,0,0,.6)",
             display: "flex",
             alignItems: "center",
-            gap: 13
+            gap: 13,
+            opacity: 0
           }}>
             <span style={{
               fontFamily: "var(--font-heading)",
@@ -241,8 +241,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="bw-hide-mobile" style={{
+      {/* Scroll indicator — spring-based bob */}
+      <div ref={scrollIndicatorRef} className="bw-hide-mobile" style={{
         position: "absolute",
         bottom: 16,
         left: "50%",
@@ -250,8 +250,7 @@ export default function Hero() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 5,
-        animation: "bob 2s ease-in-out infinite"
+        gap: 5
       }}>
         <span style={{
           fontFamily: "var(--font-mono)",
@@ -266,4 +265,74 @@ export default function Hero() {
       </div>
     </header>
   );
+}
+
+/** Spring-hover button component for hero */
+function HeroButton({ href, variant, text }) {
+  const ref = useRef(null)
+  const baseStyle = variant === "primary"
+    ? {
+        textDecoration: "none",
+        background: "var(--color-accent)",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: 16,
+        padding: "15px 26px",
+        borderRadius: 12,
+        boxShadow: "0 14px 30px rgba(37,99,235,.4)",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 56,
+        minWidth: 44,
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent"
+      }
+    : {
+        textDecoration: "none",
+        background: "rgba(255,255,255,.1)",
+        color: "#fff",
+        fontWeight: 600,
+        fontSize: 16,
+        padding: "15px 26px",
+        borderRadius: 12,
+        border: "1px solid rgba(255,255,255,.35)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 56,
+        minWidth: 44,
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent"
+      }
+
+  const hoverStyle = variant === "primary"
+    ? { background: "#1D4ED8", transform: "translateY(-2px)" }
+    : { background: "rgba(255,255,255,.2)", transform: "translateY(-2px)" }
+
+  const defaultStyleRef = useRef({ background: baseStyle.background })
+
+  const handleEnter = () => {
+    if (!ref.current) return
+    animate(ref.current, hoverStyle, { easing: spring({ stiffness: 300, damping: 20 }), duration: 0.25 })
+  }
+
+  const handleLeave = () => {
+    if (!ref.current) return
+    animate(ref.current,
+      { background: defaultStyleRef.current.background, transform: "none" },
+      { easing: spring({ stiffness: 200, damping: 22 }), duration: 0.3 }
+    )
+  }
+
+  return (
+    <a ref={ref} href={href} style={baseStyle}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {text}
+    </a>
+  )
 }
