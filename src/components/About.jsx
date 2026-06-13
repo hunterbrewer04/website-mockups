@@ -50,7 +50,7 @@ export default function About() {
           <h2 style={{
             fontFamily: "var(--font-heading)",
             fontWeight: 800,
-            fontSize: 40,
+            fontSize: "clamp(28px, 5vw, 40px)",
             lineHeight: 1.1,
             letterSpacing: "-0.02em",
             color: "var(--color-text-dark)",
@@ -59,7 +59,7 @@ export default function About() {
             The difference is in the details.
           </h2>
           <p style={{
-            fontSize: 17,
+            fontSize: "clamp(15px, 2vw, 17px)",
             lineHeight: 1.55,
             margin: "14px 0 24px",
             maxWidth: 480
@@ -68,7 +68,7 @@ export default function About() {
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {benefits.map((b, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 13 }}>
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 13, minHeight: 44 }}>
                 <span style={{
                   marginTop: 1,
                   width: 26, height: 26,
@@ -138,10 +138,10 @@ export default function About() {
             <div style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 800,
-              fontSize: 38,
+              fontSize: "clamp(28px, 4vw, 38px)",
               letterSpacing: "-0.02em"
             }}>98%</div>
-            <div style={{ fontSize: 14, color: "#AAB6C6", marginTop: 2, lineHeight: 1.4 }}>
+            <div style={{ fontSize: "clamp(12px, 1.4vw, 14px)", color: "#AAB6C6", marginTop: 2, lineHeight: 1.4 }}>
               of projects finished on schedule
             </div>
           </div>
@@ -154,10 +154,10 @@ export default function About() {
             <div style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 800,
-              fontSize: 38,
+              fontSize: "clamp(28px, 4vw, 38px)",
               letterSpacing: "-0.02em"
             }}>10-yr</div>
-            <div style={{ fontSize: 14, color: "#D5E2FB", marginTop: 2, lineHeight: 1.4 }}>
+            <div style={{ fontSize: "clamp(12px, 1.4vw, 14px)", color: "#D5E2FB", marginTop: 2, lineHeight: 1.4 }}>
               workmanship warranty
             </div>
           </div>

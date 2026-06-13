@@ -53,7 +53,7 @@ export default function Gallery() {
             <h2 style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 800,
-              fontSize: 42,
+              fontSize: "clamp(28px, 5vw, 42px)",
               lineHeight: 1.08,
               letterSpacing: "-0.02em",
               color: "var(--color-text-dark)",
@@ -62,10 +62,18 @@ export default function Gallery() {
               Recent projects.
             </h2>
           </div>
-          <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+          {/* Filter pills — horizontally scrollable on mobile */}
+          <div className="bw-scroll-x" style={{
+            display: "flex",
+            gap: 9,
+            flexWrap: "nowrap",
+            paddingBottom: 4
+          }}>
             {filterCategories.map(f => (
               <button key={f} onClick={() => setActiveFilter(f)} style={{
-                padding: "9px 18px",
+                padding: "11px 20px",
+                minWidth: 44,
+                minHeight: 44,
                 borderRadius: 999,
                 border: f === activeFilter ? "1px solid #2563EB" : "1px solid #E7E3DB",
                 background: f === activeFilter ? "#2563EB" : "#fff",
@@ -74,7 +82,11 @@ export default function Gallery() {
                 fontSize: 14,
                 cursor: "pointer",
                 fontFamily: "inherit",
-                transition: "all .2s"
+                transition: "all .2s",
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent",
+                whiteSpace: "nowrap",
+                flexShrink: 0
               }}>
                 {f}
               </button>
@@ -97,7 +109,7 @@ export default function Gallery() {
               <path d="m9 4-6 6 6 6" />
               <path d="M3 9v9a2 2 0 0 0 2 2h9" />
             </svg>
-            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 15, color: "var(--color-text-dark)" }}>
+            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "clamp(13px, 2vw, 15px)", color: "var(--color-text-dark)" }}>
               Drag to see the transformation
             </span>
           </div>
@@ -109,6 +121,13 @@ export default function Gallery() {
             onPointerMove={(e) => {
               if (e.buttons === 1) handleBAMove(e);
             }}
+            // Touch event handler for mobile
+            onTouchMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const touch = e.touches[0];
+              const x = ((touch.clientX - rect.left) / rect.width) * 100;
+              setBaPosition(Math.max(5, Math.min(95, x)));
+            }}
             style={{
               position: "relative",
               width: "100%",
@@ -117,7 +136,8 @@ export default function Gallery() {
               overflow: "hidden",
               cursor: "ew-resize",
               userSelect: "none",
-              touchAction: "none"
+              touchAction: "none",
+              WebkitUserSelect: "none"
             }}>
             {/* After (base) */}
             <div style={{
@@ -182,8 +202,8 @@ export default function Gallery() {
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 38,
-                height: 38,
+                width: 44,
+                height: 44,
                 borderRadius: "50%",
                 background: "#fff",
                 boxShadow: "0 4px 14px rgba(14,34,53,.35)",
@@ -201,7 +221,7 @@ export default function Gallery() {
         </div>
 
         {/* Image Grid */}
-        <div style={{
+        <div className="bw-gallery-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
           gap: 16,
@@ -217,7 +237,9 @@ export default function Gallery() {
               backgroundImage: `url(/assets/${g.img})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              transition: "transform .25s, box-shadow .25s"
+              transition: "transform .25s, box-shadow .25s",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent"
             }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = "scale(1.02)";

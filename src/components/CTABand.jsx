@@ -27,10 +27,10 @@ export default function CTABand() {
         margin: "0 auto",
         textAlign: "center"
       }}>
-        <h2 style={{
+        <h2 className="bw-cta-heading" style={{
           fontFamily: "var(--font-heading)",
           fontWeight: 800,
-          fontSize: 46,
+          fontSize: "clamp(32px, 6vw, 46px)",
           lineHeight: 1.08,
           letterSpacing: "-0.02em",
           color: "#fff",
@@ -39,7 +39,7 @@ export default function CTABand() {
           Ready to transform your space?
         </h2>
         <p style={{
-          fontSize: 18,
+          fontSize: "clamp(15px, 2.2vw, 18px)",
           color: "#AAB6C6",
           margin: "16px auto 0",
           maxWidth: 540,
@@ -63,7 +63,14 @@ export default function CTABand() {
             padding: "15px 28px",
             borderRadius: 12,
             boxShadow: "0 12px 30px rgba(37,99,235,.4)",
-            transition: "background .2s, transform .2s"
+            transition: "background .2s, transform .2s",
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 56,
+            minWidth: 44
           }}
           onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-2px)"; }}
           onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
@@ -82,7 +89,11 @@ export default function CTABand() {
             display: "inline-flex",
             alignItems: "center",
             gap: 9,
-            transition: "border-color .2s"
+            transition: "border-color .2s",
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+            minHeight: 56,
+            minWidth: 44
           }}
           onMouseEnter={e => { e.target.style.borderColor = "#fff"; }}
           onMouseLeave={e => { e.target.style.borderColor = "rgba(255,255,255,.25)"; }}

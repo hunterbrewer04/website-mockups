@@ -27,7 +27,7 @@ export default function ServiceArea() {
           <h2 style={{
             fontFamily: "var(--font-heading)",
             fontWeight: 800,
-            fontSize: 40,
+            fontSize: "clamp(28px, 5vw, 40px)",
             lineHeight: 1.1,
             letterSpacing: "-0.02em",
             color: "var(--color-text-dark)",
@@ -36,7 +36,7 @@ export default function ServiceArea() {
             Proudly serving Greater Northgate.
           </h2>
           <p style={{
-            fontSize: 17,
+            fontSize: "clamp(15px, 2vw, 17px)",
             lineHeight: 1.55,
             margin: "14px 0 22px",
             maxWidth: 460

@@ -4,7 +4,8 @@ export default function Footer() {
   return (
     <footer style={{
       background: "var(--color-dark-secondary)",
-      padding: "50px 22px 30px"
+      padding: "50px 22px 30px",
+      paddingBottom: "calc(30px + var(--safe-bottom))"
     }}>
       <div className="bw-footer-grid" style={{
         maxWidth: 1180,
@@ -143,7 +144,13 @@ function FooterLink({ href, children }) {
       textDecoration: "none",
       color: "#AAB6C6",
       fontSize: 14.5,
-      transition: "color .2s"
+      padding: "6px 0",
+      minHeight: 44,
+      display: "inline-flex",
+      alignItems: "center",
+      transition: "color .2s",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent"
     }}
     onMouseEnter={e => { e.target.style.color = "#fff"; }}
     onMouseLeave={e => { e.target.style.color = "#AAB6C6"; }}
@@ -154,13 +161,19 @@ function FooterLink({ href, children }) {
 function SocialIcon({ icon }) {
   return (
     <a href="#top" aria-label="Social" style={{
-      width: 38, height: 38, borderRadius: 10,
+      width: 44,
+      height: 44,
+      minWidth: 44,
+      minHeight: 44,
+      borderRadius: 10,
       border: "1px solid rgba(255,255,255,.16)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       textDecoration: "none",
-      transition: "background .2s"
+      transition: "background .2s",
+      touchAction: "manipulation",
+      WebkitTapHighlightColor: "transparent"
     }}
     onMouseEnter={e => { e.target.style.background = "rgba(255,255,255,.1)"; }}
     onMouseLeave={e => { e.target.style.background = "transparent"; }}

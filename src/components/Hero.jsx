@@ -29,7 +29,8 @@ export default function Hero() {
           backgroundImage: "url(/assets/983a1705-7e5c-46a0-be31-e62efc722e7a.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center 35%",
-          animation: "kenburns 26s ease-in-out infinite alternate"
+          animation: "kenburns 26s ease-in-out infinite alternate",
+          willChange: "transform"
         }} />
         <div style={{
           position: "absolute",
@@ -86,7 +87,7 @@ export default function Hero() {
         padding: "0 24px 60px"
       }}>
         {/* Badge */}
-        <div className="hero-animate-up" style={{
+        <div className="hero-animate-up bw-hero-badge" style={{
           display: "inline-flex",
           alignItems: "center",
           gap: 8,
@@ -105,14 +106,14 @@ export default function Hero() {
         </div>
 
         {/* Main heading */}
-        <h1 className="hero-animate-pop" style={{
+        <h1 className="hero-animate-pop bw-hero-heading" style={{
           fontFamily: "var(--font-heading)",
           fontWeight: 800,
           color: "#fff",
           letterSpacing: "-0.03em",
           lineHeight: 0.84,
           margin: "16px 0 0",
-          fontSize: "clamp(58px, 13vw, 212px)",
+          fontSize: "clamp(48px, 13vw, 212px)",
           textTransform: "uppercase",
           textShadow: "0 24px 60px rgba(0,0,0,.45)"
         }}>
@@ -133,8 +134,8 @@ export default function Hero() {
             <p style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 600,
-              fontSize: "clamp(23px, 3vw, 36px)",
-              lineHeight: 1.04,
+              fontSize: "clamp(18px, 3vw, 36px)",
+              lineHeight: 1.15,
               letterSpacing: "-0.02em",
               color: "#fff",
               margin: 0
@@ -142,7 +143,7 @@ export default function Hero() {
               Residential &amp; commercial painters.
             </p>
             <p style={{
-              fontSize: "clamp(15px, 1.5vw, 18px)",
+              fontSize: "clamp(14px, 1.5vw, 18px)",
               color: "rgba(255,255,255,.8)",
               margin: "12px 0 0",
               maxWidth: 480,
@@ -150,7 +151,12 @@ export default function Hero() {
             }}>
               Interior, exterior, cabinets &amp; drywall — meticulous prep, premium paint, and a finish that lasts.
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 13, marginTop: 24 }}>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 13,
+              marginTop: 24
+            }}>
               <a href="#contact" style={{
                 textDecoration: "none",
                 background: "var(--color-accent)",
@@ -160,7 +166,14 @@ export default function Hero() {
                 padding: "15px 26px",
                 borderRadius: 12,
                 boxShadow: "0 14px 30px rgba(37,99,235,.4)",
-                transition: "background .2s, transform .2s"
+                transition: "background .2s, transform .2s",
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 56,
+                minWidth: 44
               }}
               onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
@@ -178,7 +191,14 @@ export default function Hero() {
                 border: "1px solid rgba(255,255,255,.35)",
                 backdropFilter: "blur(6px)",
                 transition: "background .2s, transform .2s",
-                WebkitBackdropFilter: "blur(6px)"
+                WebkitBackdropFilter: "blur(6px)",
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 56,
+                minWidth: 44
               }}
               onMouseEnter={e => { e.target.style.background = "rgba(255,255,255,.2)"; e.target.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.target.style.background = "rgba(255,255,255,.1)"; e.target.style.transform = "none"; }}

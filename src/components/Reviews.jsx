@@ -63,7 +63,7 @@ export default function Reviews() {
             <h2 style={{
               fontFamily: "var(--font-heading)",
               fontWeight: 800,
-              fontSize: 40,
+              fontSize: "clamp(28px, 5vw, 40px)",
               lineHeight: 1.1,
               letterSpacing: "-0.02em",
               color: "var(--color-text-dark)",
@@ -94,9 +94,9 @@ export default function Reviews() {
           </div>
         </div>
 
-        <div style={{
+        <div className="bw-reviews-grid" style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: 20
         }}>
           {reviews.map((r, i) => (

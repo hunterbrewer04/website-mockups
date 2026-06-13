@@ -37,7 +37,7 @@ const trustItems = [
 export default function TrustStrip() {
   return (
     <section style={{ background: "var(--color-dark-secondary)" }}>
-      <div style={{
+      <div className="bw-trust-grid" style={{
         maxWidth: 1180,
         margin: "0 auto",
         padding: "26px 22px",
@@ -50,14 +50,17 @@ export default function TrustStrip() {
             display: "flex",
             alignItems: "center",
             gap: 12,
-            justifyContent: "center"
+            justifyContent: "center",
+            padding: "6px 0",
+            minHeight: 44
           }}>
-            <span style={{ color: "#7FA8F0", display: "flex" }}>{item.icon}</span>
+            <span style={{ color: "#7FA8F0", display: "flex", flexShrink: 0 }}>{item.icon}</span>
             <span style={{
               color: "#fff",
               fontWeight: 600,
-              fontSize: 15,
-              fontFamily: "var(--font-heading)"
+              fontSize: "clamp(13px, 1.5vw, 15px)",
+              fontFamily: "var(--font-heading)",
+              whiteSpace: "nowrap"
             }}>
               {item.label}
             </span>

@@ -22,6 +22,11 @@
   --font-heading: 'Schibsted Grotesk', sans-serif;
   --font-body: 'Hanken Grotesk', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, monospace;
+  /* Safe area insets for iPhone notch + home indicator */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 * {
@@ -30,6 +35,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Prevent iOS text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -39,9 +46,37 @@ body {
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Safe area padding for iPhone notch + home indicator */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
 }
 
-/* Animations */
+/* === Global Mobile Touch Optimizations === */
+
+/* Eliminate tap highlight on all interactive elements */
+a, button, input, select, textarea, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Apply touch-action: manipulation globally to kill 300ms delay + double-tap zoom */
+a, button, [role="button"], input[type="submit"], input[type="button"] {
+  touch-action: manipulation;
+}
+
+/* Smooth momentum scrolling for iOS */
+.bw-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.bw-scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* === Animations === */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(26px); }
   to { opacity: 1; transform: none; }
@@ -82,7 +117,18 @@ body {
   to { opacity: 1; transform: none; }
 }
 
-/* Utility classes */
+/* Mobile menu slide animation */
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes menuSlideUp {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Utility classes === */
 .bw-hide-mobile {
   display: flex;
 }
@@ -91,6 +137,7 @@ body {
   display: none;
 }
 
+/* === Mobile breakpoint: 860px (tablet and below) === */
 @media (max-width: 860px) {
   .bw-hide-mobile {
     display: none !important;
@@ -119,14 +166,96 @@ body {
   .bw-footer-grid {
     grid-template-columns: 1fr 1fr !important;
   }
+  /* TrustStrip: 2 columns on tablet */
+  .bw-trust-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
 }
 
-/* Section padding */
+/* === Phone breakpoint: 480px and below (iPhone 16 Pro: 393px) === */
+@media (max-width: 480px) {
+  /* TrustStrip: stack to single column if needed, or keep 2 cols */
+  .bw-trust-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Process: stack to single column on very narrow screens */
+  .bw-process-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Footer: single column on phone */
+  .bw-footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Tighter section padding for phone */
+  .bw-sec {
+    padding: 48px 16px !important;
+  }
+
+  /* Hero adjustments for phone */
+  .bw-hero-badge {
+    font-size: 11px !important;
+    padding: 5px 11px !important;
+  }
+
+  /* Services grid: ensure min-width doesn't overflow */
+  .bw-services-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Gallery grid: 1 column on phone */
+  .bw-gallery-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Contact form: stack name/phone fields */
+  .bw-contact-form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Headings scaling */
+  .bw-h2 {
+    font-size: 28px !important;
+  }
+
+  .bw-h2-lg {
+    font-size: 32px !important;
+  }
+
+  /* CTA band heading */
+  .bw-cta-heading {
+    font-size: 32px !important;
+  }
+
+  /* Reviews grid: single column */
+  .bw-reviews-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* === Specific iPhone 16 Pro (393px) refinements === */
+@media (max-width: 393px) {
+  .bw-trust-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Even tighter hero heading on narrowest screens */
+  .bw-hero-heading {
+    font-size: 42px !important;
+  }
+}
+
+/* === Section padding === */
 .bw-sec {
   padding: 80px 22px;
 }
 
-/* Hero animations */
+/* === Hero animations === */
 .hero-animate-up {
   opacity: 0;
   animation: heroUp 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -147,9 +276,16 @@ body {
   animation: heroUp 0.8s 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Focus styles */
+/* === Focus styles === */
 input:focus, select:focus, textarea:focus {
   border-color: var(--color-accent) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
   background: #fff !important;
+}
+
+/* === Active state for touch devices (replaces hover) === */
+@media (hover: none) and (pointer: coarse) {
+  a:active, button:active {
+    opacity: 0.8;
+  }
 }

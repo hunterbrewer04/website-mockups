@@ -98,7 +98,7 @@ export default function Services() {
           <h2 style={{
             fontFamily: "var(--font-heading)",
             fontWeight: 800,
-            fontSize: 42,
+            fontSize: "clamp(28px, 5vw, 42px)",
             lineHeight: 1.08,
             letterSpacing: "-0.02em",
             color: "var(--color-text-dark)",
@@ -107,7 +107,7 @@ export default function Services() {
             Painting done right, start to finish.
           </h2>
           <p style={{
-            fontSize: 17,
+            fontSize: "clamp(15px, 2vw, 17px)",
             lineHeight: 1.55,
             margin: "14px 0 0"
           }}>
@@ -115,9 +115,9 @@ export default function Services() {
           </p>
         </div>
 
-        <div style={{
+        <div className="bw-services-grid" style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: 20,
           marginTop: 48
         }}>
@@ -129,7 +129,9 @@ export default function Services() {
               border: "1px solid var(--color-border)",
               borderRadius: 18,
               overflow: "hidden",
-              transition: "transform .25s, box-shadow .25s, border-color .25s"
+              transition: "transform .25s, box-shadow .25s, border-color .25s",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent"
             }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = "translateY(-6px)";
@@ -140,6 +142,15 @@ export default function Services() {
               e.currentTarget.style.transform = "none";
               e.currentTarget.style.boxShadow = "none";
               e.currentTarget.style.borderColor = "#E7E3DB";
+            }}
+            // Touch-friendly active state for tap feedback
+            onTouchStart={e => {
+              e.currentTarget.style.transform = "translateY(-3px)";
+              e.currentTarget.style.boxShadow = "0 14px 30px -18px rgba(14,34,53,.35)";
+            }}
+            onTouchEnd={e => {
+              e.currentTarget.style.transform = "none";
+              e.currentTarget.style.boxShadow = "none";
             }}
             >
               <div style={s.imgStyle}>

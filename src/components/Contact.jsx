@@ -32,7 +32,7 @@ export default function Contact() {
           <h2 style={{
             fontFamily: "var(--font-heading)",
             fontWeight: 800,
-            fontSize: 40,
+            fontSize: "clamp(28px, 5vw, 40px)",
             lineHeight: 1.1,
             letterSpacing: "-0.02em",
             color: "var(--color-text-dark)",
@@ -41,7 +41,7 @@ export default function Contact() {
             Let&apos;s get your estimate started.
           </h2>
           <p style={{
-            fontSize: 17,
+            fontSize: "clamp(15px, 2vw, 17px)",
             lineHeight: 1.55,
             margin: "14px 0 28px",
             maxWidth: 420
@@ -130,23 +130,23 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="bw-contact-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <label style={{ display: "block" }}>
                   <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Name</span>
-                  <input required type="text" placeholder="Jane Doe" style={inputStyle} />
+                  <input required type="text" name="name" placeholder="Jane Doe" autoComplete="name" inputMode="text" style={inputStyle} />
                 </label>
                 <label style={{ display: "block" }}>
                   <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Phone</span>
-                  <input required type="tel" placeholder="(555) 000-0000" style={inputStyle} />
+                  <input required type="tel" name="phone" placeholder="(555) 000-0000" autoComplete="tel" inputMode="tel" style={inputStyle} />
                 </label>
               </div>
               <label style={{ display: "block", marginTop: 16 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Email</span>
-                <input required type="email" placeholder="you@email.com" style={inputStyle} />
+                <input required type="email" name="email" placeholder="you@email.com" autoComplete="email" inputMode="email" style={inputStyle} />
               </label>
               <label style={{ display: "block", marginTop: 16 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Service type</span>
-                <select style={{ ...inputStyle, appearance: "none" }}>
+                <select name="service_type" style={{ ...inputStyle, appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m6 9 6 6 6-6' fill='none' stroke='%236B7180' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", backgroundSize: 18, paddingRight: 40 }}>
                   <option>Interior painting</option>
                   <option>Exterior painting</option>
                   <option>Spray painting</option>
@@ -158,7 +158,7 @@ export default function Contact() {
               </label>
               <label style={{ display: "block", marginTop: 16 }}>
                 <span style={{ display: "block", fontSize: 13.5, fontWeight: 600, color: "var(--color-text-dark)", marginBottom: 7 }}>Project details</span>
-                <textarea rows="4" placeholder="Tell us about the rooms, square footage, timeline…" style={{ ...inputStyle, resize: "vertical" }} />
+                <textarea name="details" rows="4" placeholder="Tell us about the rooms, square footage, timeline…" inputMode="text" style={{ ...inputStyle, resize: "vertical", minHeight: 100 }} />
               </label>
               <button type="submit" style={{
                 width: "100%",
@@ -170,10 +170,13 @@ export default function Contact() {
                 fontFamily: "inherit",
                 border: "none",
                 padding: 15,
+                minHeight: 56,
                 borderRadius: 12,
                 cursor: "pointer",
                 boxShadow: "0 10px 24px rgba(37,99,235,.3)",
-                transition: "background .2s, transform .2s"
+                transition: "background .2s, transform .2s",
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent"
               }}
               onMouseEnter={e => { e.target.style.background = "#1D4ED8"; e.target.style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { e.target.style.background = "#2563EB"; e.target.style.transform = "none"; }}
@@ -225,10 +228,11 @@ const inputStyle = {
   border: "1px solid #E7E3DB",
   background: "#FBFAF8",
   borderRadius: 11,
-  padding: "13px 14px",
-  fontSize: 15,
+  padding: "14px 15px",
+  fontSize: 16,
   fontFamily: "inherit",
   color: "#0E2235",
   outline: "none",
-  transition: "border-color .2s, box-shadow .2s"
+  transition: "border-color .2s, box-shadow .2s",
+  WebkitAppearance: "none"
 };
